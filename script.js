@@ -234,3 +234,139 @@ document.addEventListener('DOMContentLoaded', () => {
     scheduler.addTask(new Task("Task3", 0.2));
     scheduler.addTask(new Task("Task4", 0.8));
 });
+
+// Add this code to your existing script.js file
+
+// Initialize chart variables
+let performanceChart;
+
+// Add this function to your EnergyEfficientScheduler class
+function updatePerformanceChart() {
+    const cpuNames = this.cpus.map(cpu => cpu.name);
+    const frequencies = this.cpus.map(cpu => cpu.currentFreq);
+    const utilizations = this.cpus.map(cpu => cpu.utilization * 100);
+    const energyValues = this.cpus.map(cpu => {
+        // Calculate total energy for each CPU
+        let totalEnergy = 0;
+        for (const task of cpu.tasks) {
+            totalEnergy += cpu.calculateEnergy(task);
+        }
+        return totalEnergy;
+    });
+
+    // Check if canvas element exists
+    const chartCanvas = document.getElementById('performanceChart');
+    if (!chartCanvas) {
+        console.error('Performance chart canvas not found');
+        return;
+    }
+
+    // Create or update the chart
+    if (!performanceChart) {
+        const ctx = chartCanvas.getContext('2d');
+        performanceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: cpuNames,
+                datasets: [
+                    {
+                        label: 'Frequency (GHz)',
+                        data: frequencies,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        borderSkipped: false
+                    },
+                    {
+                        label: 'Utilization (%)',
+                        data: utilizations,
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        borderSkipped: false
+                    },
+                    {
+                        label: 'Energy (W)',
+                        data: energyValues,
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        borderSkipped: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1500,
+                    easing: 'easeOutQuart'
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: true
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.2)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'CPU Performance Comparison',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    } else {
+        // Update existing chart
+        performanceChart.data.datasets[0].data = frequencies;
+        performanceChart.data.datasets[1].data = utilizations;
+        performanceChart.data.datasets[2].data = energyValues;
+        performanceChart.update();
+    }
+}
+
+// Add this line to your scheduleTasks method after updating the energy chart
+this.updatePerformanceChart();
+
+// Make sure to bind the method to your scheduler instance
+document.addEventListener('DOMContentLoaded', () => {
+    // Your existing initialization code
+    
+    // Create scheduler
+    const scheduler = new EnergyEfficientScheduler(cpus);
+    
+    // Add the updatePerformanceChart method to the scheduler
+    scheduler.updatePerformanceChart = updatePerformanceChart.bind(scheduler);
+    
+    // Schedule button event
+    document.getElementById('scheduleButton').addEventListener('click', () => {
+        if (scheduler.tasks.length > 0) {
+            document.getElementById('resultsLog').innerHTML = '';
+            scheduler.scheduleTasks();
+            scheduler.updatePerformanceChart(); // Make sure this line is here
+        } else {
+            alert('Please add at least one task to schedule');
+        }
+    });
+
+    // Call it once to initialize the chart with example tasks
+    scheduler.updatePerformanceChart();
+});
