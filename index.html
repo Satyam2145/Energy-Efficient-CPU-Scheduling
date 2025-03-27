@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Energy Efficient CPU Scheduler</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -96,10 +98,21 @@
         <div class="results-container">
             <h2>Scheduling Results</h2>
             <div class="results-log" id="resultsLog"></div>
-            <div class="energy-stats">
-                <h3>Energy Consumption</h3>
-                <div class="energy-chart">
-                    <div class="chart-container" id="energyChart"></div>
+            
+            <div class="charts-container">
+                <div class="energy-stats">
+                    <h3>Energy Consumption</h3>
+                    <div class="energy-chart">
+                        <div class="chart-container" id="energyChart"></div>
+                    </div>
+                </div>
+                
+                <!-- Add new responsive graph section -->
+                <div class="performance-stats">
+                    <h3>CPU Performance Metrics</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
