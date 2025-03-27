@@ -113,6 +113,10 @@ class EnergyEfficientScheduler {
         }
 
         this.updateEnergyChart();
+        // Call updatePerformanceChart if it exists
+        if (typeof this.updatePerformanceChart === 'function') {
+            this.updatePerformanceChart();
+        }
     }
 
     updateTaskList() {
@@ -204,6 +208,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Create scheduler
     const scheduler = new EnergyEfficientScheduler(cpus);
+    
+    // Add the updatePerformanceChart method to the scheduler
+    scheduler.updatePerformanceChart = updatePerformanceChart.bind(scheduler);
 
     // Add task button event
     document.getElementById('addTask').addEventListener('click', () => {
@@ -223,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scheduler.tasks.length > 0) {
             document.getElementById('resultsLog').innerHTML = '';
             scheduler.scheduleTasks();
+            scheduler.updatePerformanceChart(); // Call the chart update here
         } else {
             alert('Please add at least one task to schedule');
         }
@@ -233,6 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
     scheduler.addTask(new Task("Task2", 0.5));
     scheduler.addTask(new Task("Task3", 0.2));
     scheduler.addTask(new Task("Task4", 0.8));
+    
+    // Initialize the chart with example tasks
+    scheduler.updatePerformanceChart();
 });
 
 // Add this code to your existing script.js file
@@ -342,31 +353,3 @@ function updatePerformanceChart() {
         performanceChart.update();
     }
 }
-
-// Add this line to your scheduleTasks method after updating the energy chart
-this.updatePerformanceChart();
-
-// Make sure to bind the method to your scheduler instance
-document.addEventListener('DOMContentLoaded', () => {
-    // Your existing initialization code
-    
-    // Create scheduler
-    const scheduler = new EnergyEfficientScheduler(cpus);
-    
-    // Add the updatePerformanceChart method to the scheduler
-    scheduler.updatePerformanceChart = updatePerformanceChart.bind(scheduler);
-    
-    // Schedule button event
-    document.getElementById('scheduleButton').addEventListener('click', () => {
-        if (scheduler.tasks.length > 0) {
-            document.getElementById('resultsLog').innerHTML = '';
-            scheduler.scheduleTasks();
-            scheduler.updatePerformanceChart(); // Make sure this line is here
-        } else {
-            alert('Please add at least one task to schedule');
-        }
-    });
-
-    // Call it once to initialize the chart with example tasks
-    scheduler.updatePerformanceChart();
-});
