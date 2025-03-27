@@ -706,12 +706,14 @@ h2 {
     font-weight: 500;
 }
 
-/* Adjust the CPU grid layout to place cores horizontally */
+/* Replace the current CPU grid layout with this improved version */
 .cpu-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, auto);
     gap: 15px;
     margin-top: 15px;
+    position: relative;
 }
 
 /* Style for each CPU core */
@@ -723,45 +725,23 @@ h2 {
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.05);
     position: relative;
+    width: 100%;
 }
 
-/* Position BigCore2 and LittleCore2 horizontally */
-#BigCore2, #LittleCore2 {
-    position: absolute;
-    width: 48%;
-    right: 0;
+.cpu:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
-#BigCore2 {
-    position: absolute;
-    width: 48%;
-  
-}
-
-#LittleCore2 {
-    top: 45%;
-    transform: translateY(10px);
-}
-
-/* Adjust BigCore1 and LittleCore1 to take left side */
-#BigCore1, #LittleCore1 {
-    width: 48%;
+/* Remove absolute positioning that was causing overlap */
+#BigCore1, #BigCore2, #LittleCore1, #LittleCore2 {
+    position: static;
+    width: auto;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    #BigCore2, #LittleCore2 {
-        position: static;
-        width: 100%;
-        transform: none;
-    }
-    
-    #BigCore1, #LittleCore1 {
-        width: 100%;
-    }
-    
     .cpu-grid {
-        display: flex;
-        flex-direction: column;
+        grid-template-columns: 1fr;
     }
 }
