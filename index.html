@@ -9,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <canvas id="backgroundCanvas"></canvas>
+    
     <div class="container">
         <header>
             <h1>Energy Efficient CPU Scheduler</h1>
@@ -32,6 +34,7 @@
                             <div class="utilization-fill" id="BigCore1-bar"></div>
                         </div>
                     </div>
+                    
                     <div class="cpu performance" id="BigCore2">
                         <h3>BigCore2</h3>
                         <div class="cpu-info">
@@ -45,6 +48,7 @@
                             <div class="utilization-fill" id="BigCore2-bar"></div>
                         </div>
                     </div>
+                    
                     <div class="cpu efficiency" id="LittleCore1">
                         <h3>LittleCore1</h3>
                         <div class="cpu-info">
@@ -58,6 +62,7 @@
                             <div class="utilization-fill" id="LittleCore1-bar"></div>
                         </div>
                     </div>
+                    
                     <div class="cpu efficiency" id="LittleCore2">
                         <h3>LittleCore2</h3>
                         <div class="cpu-info">
@@ -73,7 +78,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <div class="task-container">
                 <h2>Task Management</h2>
                 <div class="task-form">
@@ -85,13 +90,13 @@
                         <label for="utilization">Utilization (0.1-1.0):</label>
                         <input type="number" id="utilization" min="0.1" max="1.0" step="0.1" value="0.5">
                     </div>
-                    <button id="addTask">Add Task</button>
+                    <button id="addTask" class="glow-button">Add Task</button>
                 </div>
                 <div class="task-queue">
                     <h3>Task Queue</h3>
                     <ul id="taskList"></ul>
                 </div>
-                <button id="scheduleButton" class="schedule-btn">Schedule Tasks</button>
+                <button id="scheduleButton" class="schedule-btn glow-button">Schedule Tasks</button>
             </div>
         </div>
 
@@ -100,14 +105,14 @@
             <div class="results-log" id="resultsLog"></div>
             
             <div class="charts-container">
-                <div class="energy-stats">
+                <div class="chart-box">
                     <h3>Energy Consumption</h3>
                     <div class="energy-chart">
                         <div class="chart-container" id="energyChart"></div>
                     </div>
                 </div>
                 
-                <div class="performance-stats">
+                <div class="chart-box">
                     <h3>CPU Performance Metrics</h3>
                     <div class="chart-wrapper">
                         <canvas id="performanceChart"></canvas>
@@ -115,12 +120,15 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Status indicator -->
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span id="statusText">Ready</span>
+        </div>
     </div>
 
-    <!-- Add this right after the opening body tag -->
-    <canvas id="backgroundCanvas"></canvas>
     <script src="script.js"></script>
-    <!-- Add this before the closing body tag -->
     <script src="background.js"></script>
 </body>
 </html>

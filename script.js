@@ -31,6 +31,7 @@ class Task {
     }
 }
 
+// Fix the updateStatus function reference issue
 class EnergyEfficientScheduler {
     constructor(cpus) {
         this.cpus = cpus;
@@ -77,7 +78,37 @@ class EnergyEfficientScheduler {
         return selectedCpu;
     }
 
+    // Add this to your existing script.js file to enhance functionality
+    
+    // Update the status indicator
+    updateStatus(message, type = 'info') {
+        const statusText = document.getElementById('statusText');
+        const statusDot = document.querySelector('.status-dot');
+        
+        statusText.textContent = message;
+        
+        // Change color based on status type
+        if (type === 'success') {
+            statusDot.style.backgroundColor = '#2ecc71';
+            statusDot.style.boxShadow = '0 0 10px #2ecc71';
+        } else if (type === 'error') {
+            statusDot.style.backgroundColor = '#e74c3c';
+            statusDot.style.boxShadow = '0 0 10px #e74c3c';
+        } else if (type === 'working') {
+            statusDot.style.backgroundColor = '#f39c12';
+            statusDot.style.boxShadow = '0 0 10px #f39c12';
+        } else {
+            statusDot.style.backgroundColor = '#3498db';
+            statusDot.style.boxShadow = '0 0 10px #3498db';
+        }
+    }
+    
+    // Enhance the scheduler's scheduleTasks method
+    // Add this inside your EnergyEfficientScheduler class
+    // Fix the scheduleTasks method to use this.updateStatus instead of global updateStatus
     scheduleTasks() {
+        this.updateStatus('Scheduling tasks...', 'working');
+        
         this.results = [];
         // Reset CPU states
         this.cpus.forEach(cpu => {
@@ -86,39 +117,55 @@ class EnergyEfficientScheduler {
             cpu.tasks = [];
             this.updateCpuUI(cpu);
         });
-
-        for (const task of this.tasks) {
-            this.profileTask(task);
-            const cpu = this.findOptimalCpu(task);
-            
-            if (cpu) {
-                cpu.tasks.push(task);
-                cpu.utilization += task.estimatedUtilization;
-                cpu.adjustFrequency(cpu.utilization);
+    
+        // Add a slight delay to show the animation
+        setTimeout(() => {
+            for (const task of this.tasks) {
+                this.profileTask(task);
+                const cpu = this.findOptimalCpu(task);
                 
-                const result = {
-                    task: task.name,
-                    cpu: cpu.name,
-                    domain: cpu.domain,
-                    frequency: cpu.currentFreq.toFixed(2),
-                    energy: cpu.calculateEnergy(task).toFixed(2)
-                };
-                
-                this.results.push(result);
-                this.logResult(result);
-                this.updateCpuUI(cpu);
-            } else {
-                this.logMessage(`No suitable CPU found for task ${task.name}`);
+                if (cpu) {
+                    cpu.tasks.push(task);
+                    cpu.utilization += task.estimatedUtilization;
+                    cpu.adjustFrequency(cpu.utilization);
+                    
+                    const result = {
+                        task: task.name,
+                        cpu: cpu.name,
+                        domain: cpu.domain,
+                        frequency: cpu.currentFreq.toFixed(2),
+                        energy: cpu.calculateEnergy(task).toFixed(2)
+                    };
+                    
+                    this.results.push(result);
+                    this.logResult(result);
+                    this.updateCpuUI(cpu);
+                } else {
+                    this.logMessage(`No suitable CPU found for task ${task.name}`);
+                }
             }
-        }
-
-        this.updateEnergyChart();
-        // Call updatePerformanceChart if it exists
-        if (typeof this.updatePerformanceChart === 'function') {
-            this.updatePerformanceChart();
-        }
+    
+            this.updateEnergyChart();
+            
+            // Call updatePerformanceChart if it exists
+            if (typeof this.updatePerformanceChart === 'function') {
+                this.updatePerformanceChart();
+            }
+            
+            this.updateStatus('Scheduling complete!', 'success');
+            
+            // Add animation to results
+            const resultsContainer = document.querySelector('.results-container');
+            resultsContainer.classList.add('highlight');
+            setTimeout(() => {
+                resultsContainer.classList.remove('highlight');
+            }, 1000);
+            
+        }, 500); // 500ms delay for visual effect
     }
-
+    
+    // Remove these misplaced event listeners from inside the class
+    // They should be in the DOMContentLoaded event handler
     updateTaskList() {
         const taskList = document.getElementById('taskList');
         taskList.innerHTML = '';
@@ -138,6 +185,7 @@ class EnergyEfficientScheduler {
                 const index = e.target.getAttribute('data-index');
                 this.tasks.splice(index, 1);
                 this.updateTaskList();
+                this.updateStatus('Task removed', 'info');
             });
         });
     }
@@ -154,20 +202,32 @@ class EnergyEfficientScheduler {
 
     logResult(result) {
         this.logMessage(
-            `Executing ${result.task} on ${result.cpu} (Domain: ${result.domain})<br>` +
-            `CPU Frequency: ${result.frequency} GHz<br>` +
-            `Estimated Energy: ${result.energy} W`
+            `<div class="result-item">
+                <h4>Task: ${result.task}</h4>
+                <p>Assigned to: <strong>${result.cpu}</strong> (${result.domain})</p>
+                <p>CPU Frequency: <strong>${result.frequency} GHz</strong></p>
+                <p>Estimated Energy: <strong>${result.energy} W</strong></p>
+            </div>`
         );
     }
 
     logMessage(message) {
         const log = document.getElementById('resultsLog');
-        log.innerHTML += `<p>${message}</p>`;
-        log.scrollTop = log.scrollHeight;
+        if (log) {
+            log.innerHTML += message;
+            log.scrollTop = log.scrollHeight;
+        } else {
+            console.error('Results log element not found');
+        }
     }
 
     updateEnergyChart() {
         const chartContainer = document.getElementById('energyChart');
+        if (!chartContainer) {
+            console.error('Energy chart container not found');
+            return;
+        }
+        
         chartContainer.innerHTML = '';
 
         // Group results by CPU
@@ -212,6 +272,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add the updatePerformanceChart method to the scheduler
     scheduler.updatePerformanceChart = updatePerformanceChart.bind(scheduler);
 
+    // Initialize status
+    scheduler.updateStatus('Ready to schedule tasks');
+    
     // Add task button event
     document.getElementById('addTask').addEventListener('click', () => {
         const taskName = document.getElementById('taskName').value;
@@ -220,7 +283,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (taskName && !isNaN(utilization) && utilization > 0 && utilization <= 1) {
             scheduler.addTask(new Task(taskName, utilization));
             document.getElementById('taskName').value = '';
+            scheduler.updateStatus(`Added task: ${taskName}`, 'success');
         } else {
+            scheduler.updateStatus('Invalid task parameters', 'error');
             alert('Please enter a valid task name and utilization value (0.1-1.0)');
         }
     });
@@ -230,8 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scheduler.tasks.length > 0) {
             document.getElementById('resultsLog').innerHTML = '';
             scheduler.scheduleTasks();
-            scheduler.updatePerformanceChart(); // Call the chart update here
         } else {
+            scheduler.updateStatus('No tasks to schedule', 'error');
             alert('Please add at least one task to schedule');
         }
     });
